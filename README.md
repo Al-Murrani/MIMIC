@@ -1,1 +1,1 @@
-
+This project aims to analyze admission data from the Medical Information Mart for Intensive Care (MIMIC database). The dataset is read from a CSV file, converted to appropraite data types and visualized to provide insights into the number of admissions per subject and the number of patients per admission number.
