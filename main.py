@@ -1,9 +1,21 @@
+import pandas as pd
+import plotly.express as px
 import read
 from process import Process
-import plotly.express as px
+from plots import PlotlyPlots
+
+pd.set_option('display.max_columns', None)
+
+
+def calculate_date_difference(row, second_date, first_date):
+    if row[first_date].date() == row[second_date].date():
+        return 0
+    else:
+        return (row[second_date] - row[first_date]).days
+
 
 # 1. read the admission data into dataframe
-df_mimic_admission = read.read_file_to_dataframe('PathToAdmissionCSVFile')
+df_mimic_admission = read.read_file_to_dataframe('C:\\Users\\amela\\mimic\\ADMISSIONS.csv')
 
 admission_columns = df_mimic_admission.columns
 admission_shape = df_mimic_admission.shape
@@ -26,15 +38,13 @@ df_admission_no_per_subject_process = Process(admission_number_per_subject)
 
 number_of_admissions = df_admission_no_per_subject_process.count_unique_values('admission_number', 'number_subjects')
 
-
 # 4. plot Data
-scatter = px.scatter(admission_number_per_subject,
-                     y='admission_number',
-                     x='SUBJECT_ID',
-                     title='Admission Number Per Subject',
-                     labels={'SUBJECT_ID': 'Subject ID', 'admission_number': 'Admission Number'})
-scatter.update_layout(title_x=0.5)
-scatter.show()
+scatter = PlotlyPlots(admission_number_per_subject)
+scatter.plot('scatter',
+             y='admission_number',
+             x='SUBJECT_ID',
+             title='Admission Number Per Subject',
+             labels={'SUBJECT_ID': 'Subject ID', 'admission_number': 'Admission Number'})
 
 bar = px.bar(number_of_admissions,
              x='admission_number',
@@ -44,3 +54,20 @@ bar = px.bar(number_of_admissions,
 bar.update_yaxes(type='log')
 bar.update_layout(title_x=0.5)
 bar.show()
+
+# 5. Distribution of the number of admission days ('ADMITTIME', 'DISCHTIME')
+df_mimic_admission['_NUMBEROFDAYSSTAY'] = (df_mimic_admission.apply(calculate_date_difference,
+                                                                    args=('DISCHTIME', 'ADMITTIME'),
+                                                                    axis=1))
+
+group_of_days_admission = df_mimic_admission.groupby(['_NUMBEROFDAYSSTAY']).size().reset_index(name='counts')
+print(group_of_days_admission)
+
+# plot number of admission days
+bar_days_stay = PlotlyPlots(group_of_days_admission)
+bar_days_stay.plot('bar',
+                   x='_NUMBEROFDAYSSTAY',
+                   y='counts',
+                   title='Number Of Admission Days',
+                   labels={'_NUMBEROFDAYSSTAY': 'Number Of Admission Days', 'counts': 'Counts'})
+
