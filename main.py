@@ -15,7 +15,7 @@ def calculate_date_difference(row, second_date, first_date):
 
 
 # 1. read the admission data into dataframe
-df_mimic_admission = read.read_file_to_dataframe('FolderPath\ADMISSIONS.csv')
+df_mimic_admission = read.read_file_to_dataframe('C:\\Users\\amela\\mimic\\ADMISSIONS.csv')
 
 admission_columns = df_mimic_admission.columns
 admission_shape = df_mimic_admission.shape
@@ -61,7 +61,6 @@ df_mimic_admission['_NUMBEROFDAYSSTAY'] = (df_mimic_admission.apply(calculate_da
                                                                     axis=1))
 
 group_of_days_admission = df_mimic_admission.groupby(['_NUMBEROFDAYSSTAY']).size().reset_index(name='counts')
-print(group_of_days_admission)
 
 # plot number of admission days
 bar_days_stay = PlotlyPlots(group_of_days_admission)
@@ -70,4 +69,20 @@ bar_days_stay.plot('bar',
                    y='counts',
                    title='Number Of Admission Days',
                    labels={'_NUMBEROFDAYSSTAY': 'Number Of Admission Days', 'counts': 'Counts'})
+
+# what is the most common reason (disease) for admission
+admission_number_per_diagnosis = (df_mimic_to_process.count_unique_values('DIAGNOSIS', 'admission_number').sort_values
+                                  (by='admission_number', ascending=False))
+
+# what disease has the highest number of re-admission
+# count the number of admission per patient
+# select patients with count more one admission
+patients_readmission = admission_number_per_subject[admission_number_per_subject['admission_number'] > 1]
+# group by diagnosis and count and return diagnosis with the top count
+patients_readmission_details = pd.merge(df_mimic_admission, patients_readmission, on='SUBJECT_ID', how='inner')
+patients_readmission_details_to_process = Process(patients_readmission_details)
+diagnosis_admission_readmission_number = (patients_readmission_details_to_process.count_unique_values
+                                          ('DIAGNOSIS', 'readmission_number')
+                                          .sort_values(by='readmission_number', ascending=False))
+print(diagnosis_admission_readmission_number)
 
