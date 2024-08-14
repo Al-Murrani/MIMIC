@@ -3,6 +3,7 @@ import plotly.express as px
 import read
 from process import Process
 from plots import PlotlyPlots
+from readmission_analysis import *
 
 pd.set_option('display.max_columns', None)
 
@@ -77,12 +78,8 @@ admission_number_per_diagnosis = (df_mimic_to_process.count_unique_values('DIAGN
 # what disease has the highest number of re-admission
 # count the number of admission per patient
 # select patients with count more one admission
-patients_readmission = admission_number_per_subject[admission_number_per_subject['admission_number'] > 1]
-# group by diagnosis and count and return diagnosis with the top count
-patients_readmission_details = pd.merge(df_mimic_admission, patients_readmission, on='SUBJECT_ID', how='inner')
-patients_readmission_details_to_process = Process(patients_readmission_details)
-diagnosis_admission_readmission_number = (patients_readmission_details_to_process.count_unique_values
-                                          ('DIAGNOSIS', 'readmission_number')
-                                          .sort_values(by='readmission_number', ascending=False))
+# group by diagnosis and count
+analysis = ReadmissionAnalysis(admission_number_per_subject, df_mimic_admission)
+diagnosis_admission_readmission_number = analysis.run_analysis()
 print(diagnosis_admission_readmission_number)
 
