@@ -12,11 +12,11 @@ class ReadmissionAnalysis:
         """
         return self.processed_admission_df[self.processed_admission_df['admission_number'] > 1]
 
-    def merge_admission_details(self, patients_readmission):
+    def merge_admission_details(self, patients_readmission, merge_on, merge_method):
         """
         Merge admission details with patients having multiple admissions.
         """
-        return pd.merge(self.original_admission_df, patients_readmission, on='SUBJECT_ID', how='inner')
+        return pd.merge(self.original_admission_df, patients_readmission, on=merge_on, how=merge_method)
 
     def get_top_diagnosis_by_readmission(self, merged_df, diagnosis_col, count_col):
         """
@@ -30,7 +30,10 @@ class ReadmissionAnalysis:
         Run the entire analysis process.
         """
         patients_readmission = self.get_patients_with_multiple_admissions()
-        patients_readmission_details = self.merge_admission_details(patients_readmission)
+        patients_readmission_details = self.merge_admission_details(patients_readmission,
+                                                                    'SUBJECT_ID',
+                                                                    'inner')
         top_diagnosis = self.get_top_diagnosis_by_readmission(patients_readmission_details,
-                                                              'DIAGNOSIS', 'readmission_number')
+                                                              'DIAGNOSIS',
+                                                              'readmission_number')
         return top_diagnosis
