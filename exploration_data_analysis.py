@@ -5,6 +5,8 @@ import pandas as pd
 import seaborn as sns
 from scipy import stats
 
+pd.set_option('display.max_columns', None)
+
 
 # Each data type requires different EDA methods to extract meaningful insights, leading to a well-rounded analysis.
 # Summary Table
@@ -47,6 +49,16 @@ def read_files_to_dataframe(path_folder, file_format):
 # subset of df columns based on specified column type df.select_dtype(incl_column_type)
 # cast pandas object to specified data type .astype()
 
+def data_type_conversion(df, columns_list, target_type):
+    for column in columns_list:
+        if target_type == 'datetime':
+            df[column] = pd.to_datetime(df[column])
+        elif target_type == 'string':
+            df[column] = df[column].astype('string')
+        elif target_type == 'category':
+            df[column] = df[column].astype('category')
+    return df.dtypes
+
 
 def filter_categorical_data(df, col_name, categories, exclude=False):
     """
@@ -78,32 +90,21 @@ def filter_categorical_data(df, col_name, categories, exclude=False):
         return df[df[col_name].isin(categories)]
 
 
-def summarize_by_data_type(df):
-    summaries = []
+def summarize_categorical_counts(df):
+    categorical_counts = {}
 
-    # Summarize categorical columns
+    # Select categorical columns
     categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+
     for col in categorical_cols:
+        # Get value counts for the column
         value_counts = df[col].value_counts().reset_index()
         value_counts.columns = [col, 'count']
-        value_counts['summary_type'] = 'categorical'
-        summaries.append(value_counts)
 
-    # Summarize numerical columns
-    numerical_cols = df.select_dtypes(include=['number']).columns
-    numerical_summary = df[numerical_cols].describe().stack().reset_index()
-    numerical_summary.columns = ['statistic', 'column', 'value']
-    numerical_summary['summary_type'] = 'numerical'
-    summaries.append(numerical_summary)
+        # Store the value counts DataFrame in the dictionary
+        categorical_counts[col] = value_counts
 
-    # Combine all summaries into a single DataFrame
-    if summaries:
-        summary_df = pd.concat(summaries, ignore_index=True)
-    else:
-        # Return empty DataFrame if no summaries
-        summary_df = pd.DataFrame()
-
-    return summary_df
+    return categorical_counts
 
 
 def aggregate_data(df, group_by=None, agg_columns=None, agg_funcs=None, rename_aggs=None, transform_col=None,
@@ -339,6 +340,7 @@ def class_frequency(df, column_name, normalize=False, index_col=None, agg_col=No
     else:
         # Calculate class frequency
         return df[column_name].value_counts(normalize=normalize)
+
 
 # generating new features using cut
 # Correlation sns.heatmap(df.corr(), annot=True)
