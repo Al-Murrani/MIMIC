@@ -11,9 +11,9 @@ query = db.fetch_data_from_db("""SELECT p.*, a.hadm_id, a.admittime, a.dischtime
                                     INNER JOIN mimiciii.d_icd_diagnoses icd
                                     ON icd.ICD9_CODE = d.ICD9_CODE
                                     """,
-                              'mimic',
-                              'postgres',
-                              'password',
+                              'db',
+                              'user',
+                              'Password',
                               'localhost',
                               '5432')
 
