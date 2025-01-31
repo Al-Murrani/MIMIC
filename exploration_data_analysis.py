@@ -3,7 +3,6 @@ import numpy as np
 import os
 import pandas as pd
 import seaborn as sns
-from scipy import stats
 
 pd.set_option('display.max_columns', None)
 
@@ -204,9 +203,7 @@ def create_categories_from_string(df, col, patterns, categories, new_col_name, d
 
 def outlier_iqr(dataframe, column, filter_outliers):
     series = dataframe[column]
-    # q1 = np.quantile(series, 0.25)
     first_quantiles = np.quantile(series, 0.25)
-    # q3 = np.quantile(series, 0.75)
     third_quantiles = np.quantile(series, 0.75)
     # iqr = q3 - q1
     inter_quartile_range = third_quantiles - first_quantiles
