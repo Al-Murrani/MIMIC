@@ -1,13 +1,13 @@
-import db
+import extract
 
 # Create a single connection
-conn = db.connect_to_postgres(dbname="database",
-                              user="user",
-                              password="password")
+conn = extract.connect_to_postgres(dbname="database",
+                                   user="user",
+                                   password="password")
 
 # Use the same connection for multiple queries
 if conn:
-    query = db.fetch_data_from_db("""SELECT p.*, a.hadm_id, a.admittime, a.dischtime, a.deathtime, 
+    query = extract.fetch_data_from_db("""SELECT p.*, a.hadm_id, a.admittime, a.dischtime, a.deathtime, 
                                                 a.admission_type, a.diagnosis, a.hospital_expire_flag,
                                                 d.seq_num, icd.icd9_code, icd.short_title, icd.long_title
                                         FROM mimiciii.patients p
@@ -18,9 +18,8 @@ if conn:
                                         INNER JOIN mimiciii.d_icd_diagnoses icd
                                         ON icd.ICD9_CODE = d.ICD9_CODE
                                         """,
-                                  conn)
+                                       conn)
     print(query.info())
 
     # Close connection after all queries
     conn.close()
-

@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import pandas as pd
 import seaborn as sns
 
@@ -16,31 +15,6 @@ pd.set_option('display.max_columns', None)
 # | Temporal      | Time series plots, seasonal analysis, trend analysis, rolling statistics            |
 # | Text          | Word clouds, frequency distribution, n-grams, sentiment analysis, topic modeling    |
 # | Mixed         | Correlation analysis, multi-variable plots, encoding techniques                     |
-
-
-def read_files_to_dataframe(path_folder, file_format):
-    # Define the folder containing the CSV files
-    folder_path = path_folder
-
-    # List all files in the folder
-    all_files = os.listdir(folder_path)
-
-    # Filter to get only CSV files
-    csv_files = [f for f in all_files if f.endswith(file_format)]
-
-    # Initialize an empty list to hold DataFrames
-    df_list = []
-
-    # Loop through the list of CSV files and read each into a DataFrame
-    for file in csv_files:
-        file_path = os.path.join(folder_path, file)
-        df = pd.read_csv(file_path)
-        df_list.append(df)
-
-    # Concatenate all DataFrames in the list into a single DataFrame
-    combined_df = pd.concat(df_list, ignore_index=True)
-
-    return combined_df
 
 
 # To check for data type
@@ -337,7 +311,6 @@ def class_frequency(df, column_name, normalize=False, index_col=None, agg_col=No
     else:
         # Calculate class frequency
         return df[column_name].value_counts(normalize=normalize)
-
 
 # generating new features using cut
 # Correlation sns.heatmap(df.corr(), annot=True)

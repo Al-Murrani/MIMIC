@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import psycopg2
 
@@ -95,4 +96,26 @@ def fetch_data_from_db(query, conn):
     return df
 
 
+def read_files_to_dataframe(path_folder, file_format):
+    # Define the folder containing the CSV files
+    folder_path = path_folder
 
+    # List all files in the folder
+    all_files = os.listdir(folder_path)
+
+    # Filter to get only CSV files
+    csv_files = [f for f in all_files if f.endswith(file_format)]
+
+    # Initialize an empty list to hold DataFrames
+    df_list = []
+
+    # Loop through the list of CSV files and read each into a DataFrame
+    for file in csv_files:
+        file_path = os.path.join(folder_path, file)
+        df = pd.read_csv(file_path)
+        df_list.append(df)
+
+    # Concatenate all DataFrames in the list into a single DataFrame
+    combined_df = pd.concat(df_list, ignore_index=True)
+
+    return combined_df
